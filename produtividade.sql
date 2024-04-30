@@ -1,5 +1,5 @@
---Levantando a volumetria de jobs finalizados para definição de produtividade
-WITH JobsFinalizados AS (
+--Levantando a volumetria de atendimentos finalizados para definição de produtividade
+WITH atendimentosFinalizados AS (
   SELECT
     operação AS parceira,
     squad AS squad,
@@ -8,7 +8,7 @@ WITH JobsFinalizados AS (
     activity_type,
     net_time_spent,
     COUNT(*) AS total_finalizado
-  FROM `dataset.jobs_finalizados`
+  FROM `dataset.atendimentos_finalizados`
   WHERE 
     local_start_date >= '2024-01-01'
     AND (operação = 'operação1' OR operação = 'operação2')
@@ -38,7 +38,7 @@ AgentMetrics AS (
     date >= '2024-01-01'
     AND activity_type IN ("chat", "ligação", "email")
     AND squad = 'setor1'
-    AND status = 'performing_jobs'
+    AND status = 'performing_atendimentos'
     AND operação IN ("operação1", "operação2")
   GROUP BY
     date,
@@ -111,7 +111,7 @@ SELECT
   -- Calculando o NPS em porcentagem
   
   ROUND((SUM(COALESCE(nps.nps_value_promotoras, 0)) - SUM(COALESCE(nps.nps_value_detratoras, 0))) * 100.0 / NULLIF(SUM(COALESCE(nps.nps_value, 0)), 0), 2) AS nps_value_percentage
-FROM JobsFinalizados AS job
+FROM atendimentosFinalizados AS job
 LEFT JOIN AgentMetrics AS metrics
 ON
   job.date = metrics.date
